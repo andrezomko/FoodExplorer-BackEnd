@@ -1,39 +1,44 @@
 const knex = require("../database/knex");
-const AppError = require('../utils/AppError');
+const AppError = require('../utils/AppError')
 const DiskStorage = require("../providers/DiskStorage")
 const sqliteConnection = require("../database/sqlite");
+
 
 class FoodsController {
   async create(request, response) {
     const { category, name, price, description, ingredients } = request.body;
+    console.log('textinho ingredientes');
+    console.log(ingredients);
 
-    const database = await sqliteConnection();
-    const checkIfFoodExists = await database.get("SELECT * FROM foods WHERE name = (?)", [name]);
+    const database = await sqliteConnection()
+    const checkIfFoodExists = await database.get("SELECT * FROM foods WHERE name = (?)", [name])
 
     if(checkIfFoodExists){
-      throw new AppError("Prato já existente.")
-    }
+     alert('plate already exists')
+     return
+    }     
 
     const foodFilename = request.file.filename;
     const diskStorage = new DiskStorage()
     const filename = await diskStorage.saveFile(foodFilename)
 
-    const food_id = await knex("foods").insert({
+    const foodId = await knex("foods").insert({ 
       picture: filename,
       category,
       name,
       price,
       description
-    });
+  });
 
-    const ingredientsInsert = ingredients.map(ingredient => {
-      return {
-        food_id,
-        name : ingredient
-      }
-    })
+    const [food] = await knex("foods").select("id").where({name})
+    const idFood = food.id
 
-    await knex("ingredients").insert(ingredientsInsert);
+    const ingredientInsert = ingredients.map((ingred) => {
+      return{
+        food_id: idFood,
+        name : ingred
+      }})
+      await knex('ingredients').insert(ingredientInsert)
 
     return response.status(201).json();
   }

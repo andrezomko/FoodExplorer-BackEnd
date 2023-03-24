@@ -1,3 +1,6 @@
+
+const bcrypt = require("bcryptjs")
+
 const createUsers = `
   CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,7 +15,9 @@ const createUsers = `
 `;
 
 const createAdmin = `
-  INSERT INTO users (id, name, email, password, is_admin) VALUES (1, 'admin', 'admin@email.com', '123456', 1);
+  INSERT INTO users (name, email, password, is_admin)
+  SELECT 'admin', 'admin@email.com', '${bcrypt.hashSync('123456',8)}', 1
+  WHERE NOT EXISTS (SELECT 1 FROM users WHERE name = 'admin');
 `;
 
-module.exports = { createUsers, createAdmin };
+module.exports = { createUsers,createAdmin };

@@ -9,7 +9,7 @@
     "migrate": "knex migrate:latest"
   },
   "keywords": [],
-  "author": "Raul Effting",
+  "author": "André Zomkowski",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.0",
