@@ -10,7 +10,7 @@ class IngredientsController {
       .first();
 
     if (ingredientExists) {
-      throw new AppError("Ingrediente já existente.");
+      throw new AppError("This ingredient already exist.");
     }
 
     const [ingredient_id] = await knex("ingredients").insert({

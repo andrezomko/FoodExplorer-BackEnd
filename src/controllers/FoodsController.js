@@ -7,9 +7,6 @@ const sqliteConnection = require("../database/sqlite");
 class FoodsController {
   async create(request, response) {
     const { category, name, price, description, ingredients } = request.body;
-    console.log('textinho ingredientes');
-    console.log(ingredients);
-
     const database = await sqliteConnection()
     const checkIfFoodExists = await database.get("SELECT * FROM foods WHERE name = (?)", [name])
 
@@ -22,7 +19,7 @@ class FoodsController {
     const diskStorage = new DiskStorage()
     const filename = await diskStorage.saveFile(foodFilename)
 
-    const foodId = await knex("foods").insert({ 
+     await knex("foods").insert({ 
       picture: filename,
       category,
       name,
@@ -117,7 +114,6 @@ class FoodsController {
     await knex("foods").where({ id }).update(food);
     await knex("foods").where({ id }).update("updated_at", knex.fn.now());
 
-    /* ingredients */
     const ingredientsInsert = ingredients.map(ingredient => {
       return {
         food_id: id,

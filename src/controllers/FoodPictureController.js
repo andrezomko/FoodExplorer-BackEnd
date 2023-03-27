@@ -1,16 +1,14 @@
 const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 const DiskStorage = require("../providers/DiskStorage");
-const multer = require("multer");
+
 
 
 class FoodPictureController {
   async update(request, response) {
     const  id  = request.params.id;
-    console.log(request);
-    const nameFile = request.file?.filename 
-    const pictureFilename = nameFile
-    
+    const pictureFilename = request.file?.filename 
+
     const diskStorage = new DiskStorage();
 
     const food = await knex("foods").where({ id }).first();
@@ -22,8 +20,8 @@ class FoodPictureController {
     if(food.picture) {
       await diskStorage.deleteFile(food.picture);
     }
-
     const filename = await diskStorage.saveFile(pictureFilename);
+    
     food.picture = filename;
 
     await knex("foods").update(food).where({ id });

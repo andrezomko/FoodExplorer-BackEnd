@@ -1,5 +1,4 @@
 const { hash, compare } = require("bcrypt");
-
 const AppError = require("../utils/AppError.js");
 const sqliteConnection = require("../database/sqlite");
 const knex = require('../database/knex')
@@ -8,11 +7,10 @@ class UsersController {
   async create(request, response) {
     const { name, email, password } = request.body;
 
-  
     const [checkIfUserExists] = await knex('users').select().where({email})
 
     if(checkIfUserExists) {
-      throw new AppError("Este e-mail já está em uso.");
+      throw new AppError("E-mail already in use!");
     }
 
     const hashedPassword = await hash(password, 8);
@@ -32,26 +30,26 @@ class UsersController {
     const user = await database.get("SELECT id, name, email, password FROM users WHERE email = ?", [email]);
 
     if(!user){
-      throw new AppError("Usuário não encontrado!");
+      throw new AppError("User not found!");
     }
 
     const ifEmailAlreadyExists = await database.get("SELECT * FROM users WHERE email = (?)", [email]);
 
     if(ifEmailAlreadyExists && ifEmailAlreadyExists.id !== user.id){
-      throw new AppError("Este e-mail já está em uso!");
+      throw new AppError("E-mail already in use!");
     }
 
     user.name = name ?? user.name;
     user.email = email ?? user.email;
 
     if(password && !old_password){
-      throw new AppError("Informe a senha antiga para criar uma nova senha!");
+      throw new AppError("Please inform your old password to create a new one.");
     }
 
     if(password && old_password){
       const checkOldPassword = await compare(old_password, user.password);
       if(!checkOldPassword){
-        throw new AppError("A senha antiga não confere.");
+        throw new AppError("Old password does not match");
       }
 
       user.password = await hash(password, 8);

@@ -10,7 +10,7 @@ class DiskStorage {
       if (fs.existsSync(tmpPath)) {
         await fs.promises.rename(tmpPath, uploadPath);
       } else {
-        console.error(`Arquivo ${tmpPath} não encontrado`);
+        console.error(`File ${tmpPath} not found`);
       }      
       return file;
     }
